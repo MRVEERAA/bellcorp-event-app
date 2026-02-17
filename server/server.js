@@ -20,8 +20,9 @@ app.use(express.urlencoded({ extended: true }));
 // CORS: local + deployed frontend
 // =======================
 const allowedOrigins = [
-  "http://localhost:5173", // local
-  process.env.CLIENT_URL, // production frontend from Render env variable
+  "http://localhost:5173",
+  "https://bellcorp-event-app-tau.vercel.app",
+  "https://bellcorp-event-app-backend.onrender.com",
 ];
 
 app.use(
