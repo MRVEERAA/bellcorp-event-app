@@ -1,0 +1,41 @@
+# ------------------------
+# Node / Server
+# ------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.env
+.DS_Store
+
+# ------------------------
+# Frontend (Vite / React)
+# ------------------------
+client/node_modules/
+client/dist/
+client/.env
+client/.DS_Store
+
+# ------------------------
+# Logs
+# ------------------------
+logs/
+*.log
+*.log.*
+
+# ------------------------
+# OS / IDE / Editor files
+# ------------------------
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+Thumbs.db
+*.swp
+*.bak
+
+# ------------------------
+# Build artifacts
+# ------------------------
+dist/
+build/
