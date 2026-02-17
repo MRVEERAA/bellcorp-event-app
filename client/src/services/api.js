@@ -1,8 +1,7 @@
 import axios from "axios";
 
-// Use VITE_API_URL if defined (Vercel env), otherwise fallback to local
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+// Hard-coded backend URL (works for local + production)
+const API_BASE_URL = "https://bellcorp-event-app-backend.onrender.com/api"; // ✅ hard-coded
 
 const API = axios.create({
   baseURL: API_BASE_URL,
