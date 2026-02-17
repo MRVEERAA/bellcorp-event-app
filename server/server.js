@@ -1,83 +1,68 @@
 const express = require("express");
 const dotenv = require("dotenv");
+const mongoose = require("mongoose");
 const cors = require("cors");
-const helmet = require("helmet");
-const morgan = require("morgan");
 const path = require("path");
 
-const connectDB = require("./src/config/db");
+// Routes
 const authRoutes = require("./src/routes/authRoutes");
 const eventRoutes = require("./src/routes/eventRoutes");
 const registrationRoutes = require("./src/routes/registrationRoutes");
 
-// Load environment variables
+// Load .env from root
 dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
-// Connect to MongoDB
-connectDB();
-
+// Debug
 const app = express();
-
-// Middleware
 app.use(express.json());
-app.use(helmet());
+app.use(express.urlencoded({ extended: true }));
 
-// CORS setup
-const allowedOrigins = [
-  "http://localhost:3000", // for local dev
-  "https://bellcorp-event-app-tau.vercel.app", // your Vercel frontend
-];
+// =======================
+// CORS
+// =======================
+const allowedOrigins = [process.env.CLIENT_URL];
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin) return callback(null, true); // allow server-to-server or Postman
+      if (!origin) return callback(null, true);
       if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
-        callback(new Error(`❌ CORS Not Allowed: ${origin}`));
+        callback(new Error("❌ CORS Not Allowed: " + origin));
       }
     },
     credentials: true,
   }),
 );
 
-// Logging in dev
-if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev"));
-}
-
-// API routes
+// =======================
+// Routes
+// =======================
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/registrations", registrationRoutes);
 
-// Default API route
-app.get("/api", (req, res) => {
-  res.json({ message: "API running..." });
-});
+app.get("/api", (req, res) => res.json({ message: "API running locally" }));
 
-// Serve frontend in production
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../client/dist")));
+// =======================
+// Connect to MongoDB
+// =======================
+const startServer = async () => {
+  try {
+    if (!process.env.MONGO_URI) {
+      throw new Error("MONGO_URI not defined in .env");
+    }
 
-  // Catch-all route to serve index.html
-  app.get("/*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
-  });
-}
+    await mongoose.connect(process.env.MONGO_URI); // ✅ no options needed
+    console.log("📌 MongoDB Connected");
 
-// 404 Handler
-app.use((req, res) => res.status(404).json({ message: "Route Not Found" }));
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => console.log(`🚀 Backend running on port ${PORT}`));
+  } catch (err) {
+    console.error("❌ Server Error:", err);
+    process.exit(1);
+  }
+};
 
-// Global error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: "Internal Server Error" });
-});
-
-// Start server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () =>
-  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`),
-);
+startServer();
