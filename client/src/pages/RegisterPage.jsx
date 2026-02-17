@@ -27,7 +27,7 @@ const RegisterPage = () => {
     e.preventDefault();
 
     try {
-      await API.post("/auth/register", form);
+      await API.post("/auth/signup", form);
       alert("Registration successful!");
       navigate("/login"); // go to login after successful registration
     } catch (err) {
